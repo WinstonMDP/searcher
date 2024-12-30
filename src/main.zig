@@ -87,5 +87,5 @@ test "search for files with a string 'we'" {
 test "search for files with a string 'I' without 'not'" {
     const filenames = try search(test_dir_path, &.{"I"}, &.{"not"});
     try expectEqual(1, filenames.len);
-    try std.testing.expectEqualDeep("first", filenames[0]);
+    try expectEqualDeep("first", filenames[0]);
 }
