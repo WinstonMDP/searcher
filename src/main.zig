@@ -48,6 +48,7 @@ fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) 
     );
     var proper_file_names = ArrayList([]const u8).init(allocator);
     var dir_walker = try cwd.walk(allocator);
+    defer dir_walker.deinit();
     while (try dir_walker.next()) |entry| {
         if (entry.kind != .file) {
             continue;
