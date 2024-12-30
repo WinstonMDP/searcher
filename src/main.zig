@@ -38,6 +38,9 @@ pub fn main() !void {
 
 /// Returns names of files with content including `in` strings excluding `ex` strings.
 fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
+    if (in.len == 0) {
+        return &.{};
+    }
     const cwd =
         try std.fs.openDirAbsolute(
         dir_path,
