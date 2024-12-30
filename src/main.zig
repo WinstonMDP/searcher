@@ -9,7 +9,8 @@ var buffer: [1024 * 1024]u8 = undefined;
 pub fn main() !void {}
 
 /// Returns names of files with content including `in` strings excluding `ex` strings.
-fn search(in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
+fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
+    _ = dir_path;
     _ = ex;
     const cwd =
         try std.fs.cwd().openDir(
@@ -38,9 +39,10 @@ fn search(in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
     return proper_file_names.items;
 }
 
+const test_dir_path = "/home/WinstonMDPLinux/it/searcher/test";
+
 test "search for files with a string 'we'" {
-    try (try std.fs.cwd().openDir("test", .{})).setAsCwd();
-    const filenames = try search(&.{"we"}, &.{});
+    const filenames = try search(test_dir_path, &.{"we"}, &.{});
     try expectEqual(2, filenames.len);
     try expect(eql(u8, filenames[0], "second") and eql(u8, filenames[1], "third") or
         eql(u8, filenames[0], "third") and eql(u8, filenames[1], "second"));
