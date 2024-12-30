@@ -41,19 +41,19 @@ fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) 
     if (in.len == 0) {
         return &.{};
     }
-    const cwd =
+    const dir =
         try std.fs.openDirAbsolute(
         dir_path,
         .{ .iterate = true },
     );
     var proper_file_names = ArrayList([]const u8).init(allocator);
-    var dir_walker = try cwd.walk(allocator);
+    var dir_walker = try dir.walk(allocator);
     defer dir_walker.deinit();
     while (try dir_walker.next()) |entry| {
         if (entry.kind != .file) {
             continue;
         }
-        const file = try cwd.openFile(entry.path, .{});
+        const file = try dir.openFile(entry.path, .{});
         defer file.close();
         const size = try file.readAll(&buf);
         const heystack = buf[0..size];
