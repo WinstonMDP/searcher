@@ -16,7 +16,6 @@ pub fn main() !void {
     const stdout = std.io.getStdOut();
     while (true) {
         var line = try stdin.readUntilDelimiter(&buf, '\n');
-        _ = try stdout.writeAll(&buf);
         if (eql(u8, line[0..3], "in ")) {
             try in.append(try allocator.dupe(u8, line[3..]));
             _ = try stdout.writeAll("ok\n");
