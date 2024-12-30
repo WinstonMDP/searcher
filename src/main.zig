@@ -1,8 +1,10 @@
 const std = @import("std");
 const eql = std.mem.eql;
+const containsAtLeast = std.mem.containsAtLeast;
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
 const expectEqual = std.testing.expectEqual;
+const expectEqualDeep = std.testing.expectEqualDeep;
 const expect = std.testing.expect;
 var buffer: [1024 * 1024]u8 = undefined;
 
@@ -10,7 +12,6 @@ pub fn main() !void {}
 
 /// Returns names of files with content including `in` strings excluding `ex` strings.
 fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
-    _ = ex;
     const cwd =
         try std.fs.openDirAbsolute(
         dir_path,
@@ -24,9 +25,19 @@ fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) 
         }
         const file = try cwd.openFile(entry.path, .{});
         const size = try file.readAll(&buffer);
+        const heystack = buffer[0..size];
         var is_proper_file = true;
         for (in) |str| {
-            if (!std.mem.containsAtLeast(u8, buffer[0..size], 1, str)) {
+            if (!containsAtLeast(u8, heystack, 1, str)) {
+                is_proper_file = false;
+                break;
+            }
+        }
+        if (!is_proper_file) {
+            continue;
+        }
+        for (ex) |str| {
+            if (containsAtLeast(u8, heystack, 1, str)) {
                 is_proper_file = false;
                 break;
             }
@@ -50,5 +61,5 @@ test "search for files with a string 'we'" {
 test "search for files with a string 'I' without 'not'" {
     const filenames = try search(test_dir_path, &.{"I"}, &.{"not"});
     try expectEqual(1, filenames.len);
-    try expectEqual("first", filenames[0]);
+    try std.testing.expectEqualDeep("first", filenames[0]);
 }
