@@ -3,10 +3,11 @@ const eql = std.mem.eql;
 const containsAtLeast = std.mem.containsAtLeast;
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = gpa.allocator();
+const ArrayList = std.ArrayList;
 const expectEqual = std.testing.expectEqual;
 const expectEqualDeep = std.testing.expectEqualDeep;
 const expect = std.testing.expect;
-var buffer: [1024 * 1024]u8 = undefined;
+var buf: [1024 * 1024]u8 = undefined;
 
 pub fn main() !void {}
 
@@ -17,15 +18,15 @@ fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) 
         dir_path,
         .{ .iterate = true },
     );
-    var proper_file_names = std.ArrayList([]const u8).init(allocator);
+    var proper_file_names = ArrayList([]const u8).init(allocator);
     var dir_walker = try cwd.walk(allocator);
     while (try dir_walker.next()) |entry| {
         if (entry.kind != .file) {
             continue;
         }
         const file = try cwd.openFile(entry.path, .{});
-        const size = try file.readAll(&buffer);
-        const heystack = buffer[0..size];
+        const size = try file.readAll(&buf);
+        const heystack = buf[0..size];
         var is_proper_file = true;
         for (in) |str| {
             if (!containsAtLeast(u8, heystack, 1, str)) {
