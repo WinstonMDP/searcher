@@ -9,7 +9,32 @@ const expectEqualDeep = std.testing.expectEqualDeep;
 const expect = std.testing.expect;
 var buf: [1024 * 1024]u8 = undefined;
 
-pub fn main() !void {}
+pub fn main() !void {
+    var in = ArrayList([]const u8).init(allocator);
+    var ex = ArrayList([]const u8).init(allocator);
+    const stdin = std.io.getStdIn().reader();
+    const stdout = std.io.getStdOut();
+    while (true) {
+        var line = try stdin.readUntilDelimiter(&buf, '\n');
+        _ = try stdout.writeAll(&buf);
+        if (eql(u8, line[0..3], "in ")) {
+            try in.append(try allocator.dupe(u8, line[3..]));
+            _ = try stdout.writeAll("ok\n");
+        } else if (eql(u8, line[0..3], "ex ")) {
+            try ex.append(try allocator.dupe(u8, line[3..]));
+            _ = try stdout.writeAll("ok\n");
+        } else if (eql(u8, line[0..4], "exit")) {
+            break;
+        } else {
+            const cwd = try std.fs.cwd().realpath(".", &buf);
+            const filenames = try search(cwd, in.items, ex.items);
+            const stdout_writer = stdout.writer();
+            for (filenames) |filename| {
+                try stdout_writer.print("{s}\n", .{filename});
+            }
+        }
+    }
+}
 
 /// Returns names of files with content including `in` strings excluding `ex` strings.
 fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
