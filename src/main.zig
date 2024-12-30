@@ -89,3 +89,8 @@ test "search for files with a string 'I' without 'not'" {
     try expectEqual(1, filenames.len);
     try expectEqualDeep("first", filenames[0]);
 }
+
+test "search with empty args" {
+    const filenames = try search(test_dir_path, &.{}, &.{});
+    try expectEqual(0, filenames.len);
+}
