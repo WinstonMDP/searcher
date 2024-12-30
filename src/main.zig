@@ -1,13 +1,14 @@
 const std = @import("std");
 const eql = std.mem.eql;
 const containsAtLeast = std.mem.containsAtLeast;
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-const allocator = gpa.allocator();
 const ArrayList = std.ArrayList;
 const expectEqual = std.testing.expectEqual;
 const expectEqualDeep = std.testing.expectEqualDeep;
 const expect = std.testing.expect;
 var buf: [1024 * 1024]u8 = undefined;
+var allocator_buf: [128 * 1024 * 1024]u8 = undefined;
+var fba = std.heap.FixedBufferAllocator.init(&allocator_buf);
+const allocator = fba.allocator();
 
 pub fn main() !void {
     var in = ArrayList([]const u8).init(allocator);
