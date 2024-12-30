@@ -52,6 +52,7 @@ fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) 
             continue;
         }
         const file = try cwd.openFile(entry.path, .{});
+        defer file.close();
         const size = try file.readAll(&buf);
         const heystack = buf[0..size];
         var is_proper_file = true;
