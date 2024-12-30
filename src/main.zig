@@ -46,3 +46,9 @@ test "search for files with a string 'we'" {
     try expect(eql(u8, filenames[0], "second") and eql(u8, filenames[1], "third") or
         eql(u8, filenames[0], "third") and eql(u8, filenames[1], "second"));
 }
+
+test "search for files with a string 'I' without 'not'" {
+    const filenames = try search(test_dir_path, &.{"I"}, &.{"not"});
+    try expectEqual(1, filenames.len);
+    try expectEqual("first", filenames[0]);
+}
