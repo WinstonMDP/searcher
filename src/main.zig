@@ -10,11 +10,10 @@ pub fn main() !void {}
 
 /// Returns names of files with content including `in` strings excluding `ex` strings.
 fn search(dir_path: []const u8, in: []const []const u8, ex: []const []const u8) ![]const []const u8 {
-    _ = dir_path;
     _ = ex;
     const cwd =
-        try std.fs.cwd().openDir(
-        ".",
+        try std.fs.openDirAbsolute(
+        dir_path,
         .{ .iterate = true },
     );
     var proper_file_names = std.ArrayList([]const u8).init(allocator);
